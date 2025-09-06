@@ -21,7 +21,6 @@ jobs:
     - name: Activate Unity
       uses: game-ci/unity-activate@v2
       with:
-        unityVersion: 6000.1.14f1
         activationType: personal
 
     - name: Build project
