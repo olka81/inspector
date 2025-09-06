@@ -1,0 +1,43 @@
+name: Build & Package
+
+on:
+  pull_request:
+    branches: [main]
+  workflow_dispatch:
+
+jobs:
+  build-windows:
+    name: Build (Windows)
+    runs-on: ubuntu-latest
+
+    steps:
+    - name: Checkout
+      uses: actions/checkout@v3
+
+    - name: Cache Library
+      uses: actions/cache@v3
+      with:
+        path: Library
+        key: Library-${{ hashFiles('**/ProjectSettings/ProjectVersion.txt') }}
+        restore-keys: |
+          Library-
+
+    - name: Build project
+      uses: game-ci/unity-builder@v3
+      with:
+        unityVersion: 6000.1.14f1
+        targetPlatform: StandaloneWindows64
+
+    - name: Archive build
+      if: success()
+      run: |
+        mkdir artifacts
+        cd builds/StandaloneWindows64/
+        zip -r ../../artifacts/SpaceportInspector.zip .
+        cd ../../
+
+    - name: Upload artifact
+      uses: actions/upload-artifact@v4
+      with:
+        name: SpaceportInspector-Windows
+        path: artifacts/SpaceportInspector.zip
